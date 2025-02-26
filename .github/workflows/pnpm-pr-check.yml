@@ -74,11 +74,20 @@ jobs:
           lfs: true
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+      - name: Create GHA cache key file
+        shell: bash
+        env:
+          EXTRA_CACHE_KEY: node${{ env.CI_NODE_VERSION }}
+        run: |
+          echo "${EXTRA_CACHE_KEY}" > _ci_cachekey.txt
       - name: Use Node.js ${{ env.CI_NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
           cache: 'pnpm'
+          cache-dependency-path: |
+            _ci_cachekey.txt
+            pnpm-lock.yaml
       - name: Install dependencies
         run: |
           pnpm install --frozen-lockfile
